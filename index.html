@@ -1248,6 +1248,55 @@
             footer > div:first-child {
                 gap: 2rem !important;
             }
+
+            /* Best Sellers responsive cards */
+            .best-seller-card {
+                flex: 0 0 280px !important;
+            }
+
+            /* Hide horizontal scrollbar for categories scroll list */
+            #cat-list::-webkit-scrollbar {
+                display: none !important;
+            }
+
+            /* Lightbox responsive adjustments */
+            #lightbox-overlay button {
+                top: 20px !important;
+                right: 20px !important;
+                width: 40px !important;
+                height: 40px !important;
+            }
+            #lightbox-title {
+                font-size: 1.4rem !important;
+                margin-top: 1.5rem !important;
+            }
+
+            /* Extra small mobile screens adjustments (width <= 480px) */
+            @media (max-width: 480px) {
+                .products-grid {
+                    grid-template-columns: repeat(2, 1fr) !important;
+                    gap: 0.8rem !important;
+                }
+                .card {
+                    padding: 0.6rem !important;
+                    border-radius: 16px !important;
+                }
+                .card-img {
+                    height: 100px !important;
+                    border-radius: 10px !important;
+                    margin-bottom: 0.6rem !important;
+                }
+                .card h3 {
+                    font-size: 0.8rem !important;
+                }
+                .card .price {
+                    font-size: 0.95rem !important;
+                }
+                .card .add-btn {
+                    width: 32px !important;
+                    height: 32px !important;
+                }
+            }
         }
 
         /* Testimonials Swiper Customization */
