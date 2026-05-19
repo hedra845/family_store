@@ -1294,15 +1294,15 @@
 
     <!-- ══ BEST SELLERS SECTION ══ -->
     <section id="best-sellers-section" class="reveal" style="padding: 4rem 8% 2rem; display: none; background: linear-gradient(180deg, rgba(255, 90, 159, 0.03) 0%, rgba(155, 109, 255, 0.03) 100%); border-bottom: 1px solid rgba(0,0,0,0.03);">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
-            <div style="text-align: right;">
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 2.5rem; gap: 1.5rem;">
+            <div>
                 <span style="background: rgba(255, 90, 159, 0.1); color: var(--primary); padding: 6px 15px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0.5rem;">
                     🔥 اختيار عملائنا المفضل
                 </span>
                 <h2 style="font-size: 2.8rem; font-weight: 900; color: var(--secondary); margin: 0;">الأكثر <em>مبيعاً</em></h2>
             </div>
             <!-- Slider Controls -->
-            <div style="display: flex; gap: 0.8rem;">
+            <div style="display: flex; gap: 1rem; justify-content: center;">
                 <button onclick="slideBestSellers('right')" aria-label="السابق" class="slider-arrow">
                     <i data-lucide="chevron-right" style="width: 24px; height: 24px;"></i>
                 </button>
@@ -1757,7 +1757,7 @@
                                 <div class="card-footer">
                                     <div class="price">${p.price} EGP</div>
                                     <button class="add-btn" onclick="addToCart(${p.id})" title="إضافة للسلة">
-                                        <i data-lucide="shopping-cart" style="width: 20px; height: 20px;"></i>
+                                        <i data-lucide="plus" style="width: 22px; height: 22px;"></i>
                                     </button>
                                 </div>
                             </div>
