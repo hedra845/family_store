@@ -196,16 +196,52 @@
     function renderTab() {
         const container = document.getElementById('tab-content');
         if (activeTab === 'orders') {
-            container.innerHTML = `<h2>📦 الطلبات</h2>` + orders.map(o => `
-                <div style="background:#fff; padding:1.5rem; border-radius:15px; margin-top:1rem; border-right:5px solid ${o.status==='completed'?'green':'#e91e8c'};">
-                    <div style="display:flex; justify-content:space-between;"><strong>الطلب #${o.id}</strong> <b>${o.total_amount} EGP</b></div>
-                    <p>${o.customer_name} - ${o.customer_phone}</p>
-                    <select onchange="updateStatus(${o.id}, this.value)" style="width:auto; margin-top:10px;">
-                        <option value="pending" ${o.status==='pending'?'selected':''}>قيد التنفيذ</option>
-                        <option value="completed" ${o.status==='completed'?'selected':''}>تم التوصيل</option>
-                    </select>
+            container.innerHTML = `<h2>📦 الطلبات (${orders.length})</h2>` + orders.map(o => {
+                const date = o.created_at ? new Date(o.created_at).toLocaleString('ar-EG', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                }) : 'تاريخ غير معروف';
+
+                const payMethodLabel = o.payment_method === 'instapay' ? '💳 انستاباي (Instapay)' : '💵 الدفع عند الاستلام';
+
+                return `
+                <div style="background:#fff; padding:2rem; border-radius:24px; margin-top:1.5rem; border-right:6px solid ${o.status==='completed'?'#28a745':'var(--primary)'}; box-shadow: var(--shadow); position:relative; overflow:hidden;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:1rem; border-bottom:1px dashed rgba(0,0,0,0.05); padding-bottom:1rem;">
+                        <div>
+                            <span style="background:rgba(155, 109, 255, 0.1); color:var(--secondary); padding:4px 12px; border-radius:50px; font-weight:800; font-size:0.85rem; margin-left:8px;">
+                                الطلب #${o.id}
+                            </span>
+                            <span style="font-size:0.9rem; color:var(--text-soft); font-weight:600;">
+                                📅 ${date}
+                            </span>
+                        </div>
+                        <b style="color:var(--primary); font-size:1.4rem; font-weight:900;">${o.total_amount} EGP</b>
+                    </div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1rem; font-size:0.95rem;">
+                        <div>
+                            <p style="margin-bottom:0.4rem;"><strong>👤 العميل:</strong> ${o.customer_name}</p>
+                            <p style="margin-bottom:0.4rem;"><strong>📞 الهاتف:</strong> <a href="tel:${o.customer_phone}" style="color:var(--secondary); text-decoration:none; font-weight:700;">${o.customer_phone}</a></p>
+                            <p style="margin-bottom:0.4rem;"><strong>💳 طريقة الدفع:</strong> ${payMethodLabel}</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom:0.4rem;"><strong>📍 المدينة:</strong> ${o.city || 'غير محددة'}</p>
+                            <p style="margin-bottom:0.4rem;"><strong>🏠 العنوان بالتفصيل:</strong> ${o.address || 'غير محدد'}</p>
+                            <div style="display:flex; align-items:center; gap:8px; margin-top:0.8rem;">
+                                <strong>⚙️ حالة الطلب:</strong>
+                                <select onchange="updateStatus(${o.id}, this.value)" style="width:auto; margin-bottom:0; padding:0.4rem 1rem; border-radius:10px; font-size:0.85rem; background:#fff0f6; border-color:var(--primary);">
+                                    <option value="pending" ${o.status==='pending'?'selected':''}>قيد التنفيذ ⏳</option>
+                                    <option value="completed" ${o.status==='completed'?'selected':''}>تم التوصيل ✅</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         } else if (activeTab === 'products') {
             container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>🥜 المنتجات</h2><button class="admin-btn" onclick="showProductModal()">+ إضافة منتج</button></div>
             <table><tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>التحكم</th></tr>` + products.map(p => `
