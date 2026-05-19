@@ -1867,6 +1867,45 @@
 
         function filterByCat(id) { activeCat = id; renderCategories(); renderProducts(); }
 
+        function getProductPriceInfo(p, selectedWeight) {
+            let prices = {
+                '250g': parseFloat(p.price) || 0,
+                '500g': (parseFloat(p.price) || 0) * 2,
+                '1kg': (parseFloat(p.price) || 0) * 4
+            };
+            let hasMultipleWeights = true;
+
+            if (p.weight && p.weight.includes('|')) {
+                const parts = p.weight.split('|');
+                parts.forEach(part => {
+                    const [w, val] = part.split(':');
+                    const numVal = parseFloat(val);
+                    if (!isNaN(numVal) && numVal > 0) {
+                        prices[w] = numVal;
+                    }
+                });
+                
+                // If 500g and 1kg prices are empty or 0, it means it's a single price item
+                const p500Part = parts.find(x => x.startsWith('500g:'));
+                const p1000Part = parts.find(x => x.startsWith('1kg:'));
+                const p500 = p500Part ? parseFloat(p500Part.split(':')[1]) : 0;
+                const p1000 = p1000Part ? parseFloat(p1000Part.split(':')[1]) : 0;
+                if ((isNaN(p500) || p500 === 0) && (isNaN(p1000) || p1000 === 0)) {
+                    hasMultipleWeights = false;
+                }
+            } else if (p.weight === 'single' || p.weight === 'piece') {
+                hasMultipleWeights = false;
+            } else if (p.weight && !p.weight.includes('g') && !p.weight.includes('kg')) {
+                hasMultipleWeights = false;
+            }
+
+            return {
+                prices: prices,
+                hasMultipleWeights: hasMultipleWeights,
+                selectedPrice: prices[selectedWeight] || prices['250g'] || parseFloat(p.price) || 0
+            };
+        }
+
         let selectedWeights = {};
 
         function setProductWeight(productId, weight, event) {
@@ -1876,20 +1915,18 @@
             const prod = allProducts.find(p => p.id === productId);
             if (!prod) return;
             
-            let multiplier = 1;
-            if (weight === '500g') multiplier = 2;
-            if (weight === '1kg') multiplier = 4;
+            const priceInfo = getProductPriceInfo(prod, weight);
             
             // Update normal price label
             const priceEl = document.getElementById(`price-${productId}`);
             if (priceEl) {
-                priceEl.innerText = `${prod.price * multiplier} EGP`;
+                priceEl.innerText = `${priceInfo.selectedPrice} EGP`;
             }
             
             // Update best seller price label
             const priceBsEl = document.getElementById(`price-bs-${productId}`);
             if (priceBsEl) {
-                priceBsEl.innerText = `${prod.price * multiplier} EGP`;
+                priceBsEl.innerText = `${priceInfo.selectedPrice} EGP`;
             }
             
             // Update the active weight buttons inside BOTH normal and best seller cards if they exist
@@ -1908,23 +1945,30 @@
             const filtered = activeCat === 'all' ? allProducts : allProducts.filter(p => p.category_id == activeCat);
             grid.innerHTML = filtered.map(p => {
                 const currentWeight = selectedWeights[p.id] || '250g';
-                let multiplier = 1;
-                if (currentWeight === '500g') multiplier = 2;
-                if (currentWeight === '1kg') multiplier = 4;
+                const priceInfo = getProductPriceInfo(p, currentWeight);
                 
-                return `
-                <div class="card glass" onclick="addToCart(${p.id})">
-                    <div class="card-img" onclick="viewImage('${getImageUrl(p.image_url)}', '${p.name}', event)"><img src="${getImageUrl(p.image_url)}" alt="${p.name}"></div>
-                    <h3>${p.name}</h3>
-                    
+                let weightSelectorHtml = '';
+                if (priceInfo.hasMultipleWeights) {
+                    weightSelectorHtml = `
                     <div class="weight-selector" onclick="event.stopPropagation();">
                         <button id="btn-${p.id}-250g" class="weight-btn weight-btn-${p.id} ${currentWeight === '250g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '250g', event)">ربع كيلو</button>
                         <button id="btn-${p.id}-500g" class="weight-btn weight-btn-${p.id} ${currentWeight === '500g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '500g', event)">نصف كيلو</button>
                         <button id="btn-${p.id}-1kg" class="weight-btn weight-btn-${p.id} ${currentWeight === '1kg' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '1kg', event)">كيلو</button>
                     </div>
+                    `;
+                } else {
+                    weightSelectorHtml = `<div style="height: 48px;"></div>`;
+                }
+
+                return `
+                <div class="card glass" onclick="addToCart(${p.id})">
+                    <div class="card-img" onclick="viewImage('${getImageUrl(p.image_url)}', '${p.name}', event)"><img src="${getImageUrl(p.image_url)}" alt="${p.name}"></div>
+                    <h3>${p.name}</h3>
+                    
+                    ${weightSelectorHtml}
 
                     <div class="card-footer">
-                        <div id="price-${p.id}" class="price">${p.price * multiplier} EGP</div>
+                        <div id="price-${p.id}" class="price">${priceInfo.selectedPrice} EGP</div>
                         <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
                             <i data-lucide="plus" style="width:22px; height:22px;"></i>
                         </button>
@@ -1959,9 +2003,20 @@
                             const p = item.products;
                             if (!p || !p.is_active) return '';
                             const currentWeight = selectedWeights[p.id] || '250g';
-                            let multiplier = 1;
-                            if (currentWeight === '500g') multiplier = 2;
-                            if (currentWeight === '1kg') multiplier = 4;
+                            const priceInfo = getProductPriceInfo(p, currentWeight);
+                            
+                            let weightSelectorHtml = '';
+                            if (priceInfo.hasMultipleWeights) {
+                                weightSelectorHtml = `
+                                <div class="weight-selector" onclick="event.stopPropagation();" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                                    <button id="btn-bs-${p.id}-250g" class="weight-btn weight-btn-${p.id} ${currentWeight === '250g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '250g', event)">ربع كيلو</button>
+                                    <button id="btn-bs-${p.id}-500g" class="weight-btn weight-btn-${p.id} ${currentWeight === '500g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '500g', event)">نصف كيلو</button>
+                                    <button id="btn-bs-${p.id}-1kg" class="weight-btn weight-btn-${p.id} ${currentWeight === '1kg' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '1kg', event)">كيلو</button>
+                                </div>
+                                `;
+                            } else {
+                                weightSelectorHtml = `<div style="height: 48px;"></div>`;
+                            }
                             
                             return `
                             <div class="card glass best-seller-card" onclick="addToCart(${p.id})" style="flex: 0 0 310px; scroll-snap-align: start; margin-bottom: 0.5rem;">
@@ -1972,14 +2027,10 @@
                                 <div class="card-img" onclick="viewImage('${getImageUrl(p.image_url)}', '${p.name}', event)"><img src="${getImageUrl(p.image_url)}" alt="${p.name}"></div>
                                 <h3>${p.name}</h3>
                                 
-                                <div class="weight-selector" onclick="event.stopPropagation();" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
-                                    <button id="btn-bs-${p.id}-250g" class="weight-btn weight-btn-${p.id} ${currentWeight === '250g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '250g', event)">ربع كيلو</button>
-                                    <button id="btn-bs-${p.id}-500g" class="weight-btn weight-btn-${p.id} ${currentWeight === '500g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '500g', event)">نصف كيلو</button>
-                                    <button id="btn-bs-${p.id}-1kg" class="weight-btn weight-btn-${p.id} ${currentWeight === '1kg' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '1kg', event)">كيلو</button>
-                                </div>
+                                ${weightSelectorHtml}
 
                                 <div class="card-footer">
-                                    <div id="price-bs-${p.id}" class="price">${p.price * multiplier} EGP</div>
+                                    <div id="price-bs-${p.id}" class="price">${priceInfo.selectedPrice} EGP</div>
                                     <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
                                         <i data-lucide="plus" style="width: 22px; height: 22px;"></i>
                                     </button>
@@ -2037,19 +2088,16 @@
         function addToCart(id) {
             const prod = allProducts.find(p => p.id === id);
             const weight = selectedWeights[id] || '250g';
+            const priceInfo = getProductPriceInfo(prod, weight);
             
-            let multiplier = 1;
-            let weightLabel = 'ربع كيلو';
-            if (weight === '500g') {
-                multiplier = 2;
-                weightLabel = 'نصف كيلو';
-            } else if (weight === '1kg') {
-                multiplier = 4;
-                weightLabel = 'كيلو';
+            let itemPrice = priceInfo.selectedPrice;
+            let cartItemId = id;
+            let weightLabel = '';
+            
+            if (priceInfo.hasMultipleWeights) {
+                weightLabel = weight === '500g' ? 'نصف كيلو' : (weight === '1kg' ? 'كيلو' : 'ربع كيلو');
+                cartItemId = `${id}-${weight}`;
             }
-            
-            const itemPrice = prod.price * multiplier;
-            const cartItemId = `${id}-${weight}`;
             
             const exists = cart.find(item => item.cartItemId === cartItemId);
             if (exists) {
@@ -2058,9 +2106,9 @@
                 cart.push({
                     cartItemId: cartItemId,
                     id: id,
-                    name: `${prod.name} (${weightLabel})`,
+                    name: priceInfo.hasMultipleWeights ? `${prod.name} (${weightLabel})` : prod.name,
                     price: itemPrice,
-                    weight: weightLabel,
+                    weight: priceInfo.hasMultipleWeights ? weightLabel : '',
                     qty: 1,
                     image_url: prod.image_url
                 });

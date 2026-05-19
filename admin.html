@@ -330,7 +330,22 @@
 
     // Product Modal with Image Support
     function showProductModal(id = null) {
-        const p = id ? products.find(x => x.id === id) : { name: '', price: '', category_id: '', image_url: '' };
+        const p = id ? products.find(x => x.id === id) : { name: '', price: '', category_id: '', image_url: '', weight: '' };
+        
+        let p250 = p.price || '';
+        let p500 = '';
+        let p1000 = '';
+        
+        if (p.weight && p.weight.includes('|')) {
+            const parts = p.weight.split('|');
+            parts.forEach(part => {
+                const [w, val] = part.split(':');
+                if (w === '250g') p250 = val;
+                if (w === '500g') p500 = val;
+                if (w === '1kg') p1000 = val;
+            });
+        }
+        
         openModal(`
             <h3>${id ? 'تعديل منتج' : 'إضافة منتج'}</h3>
             <div style="text-align:center; margin-bottom:1rem;">
@@ -339,7 +354,23 @@
                 <button class="admin-btn secondary" onclick="document.getElementById('m-file').click()" style="display:block; margin:0 auto; font-size:0.8rem;">تغيير الصورة</button>
             </div>
             <input id="m-name" value="${p.name}" placeholder="الاسم">
-            <input id="m-price" type="number" value="${p.price}" placeholder="السعر">
+            
+            <label style="display:block; text-align:right; margin: 0.8rem 0 0.3rem; font-weight:700; font-size:0.85rem; color:var(--text-soft);">الأسعار حسب الوزن (ربع كيلو إلزامي، الباقي اختياري):</label>
+            <div style="display:flex; gap:10px; margin-bottom:1rem;">
+                <div style="flex:1;">
+                    <label style="display:block; text-align:right; font-size:0.75rem; color:#888;">ربع كيلو (250g)</label>
+                    <input id="m-price-250" type="number" value="${p250}" placeholder="ربع كيلو" style="margin-bottom:0; padding: 0.6rem 0.8rem;">
+                </div>
+                <div style="flex:1;">
+                    <label style="display:block; text-align:right; font-size:0.75rem; color:#888;">نصف كيلو (500g)</label>
+                    <input id="m-price-500" type="number" value="${p500 || ''}" placeholder="نصف كيلو" style="margin-bottom:0; padding: 0.6rem 0.8rem;">
+                </div>
+                <div style="flex:1;">
+                    <label style="display:block; text-align:right; font-size:0.75rem; color:#888;">كيلو (1kg)</label>
+                    <input id="m-price-1000" type="number" value="${p1000 || ''}" placeholder="كيلو" style="margin-bottom:0; padding: 0.6rem 0.8rem;">
+                </div>
+            </div>
+
             <select id="m-cat">${categories.map(c => `<option value="${c.id}" ${c.id===p.category_id?'selected':''}>${c.name}</option>`).join('')}</select>
             <button class="admin-btn" onclick="saveProduct(${id})">حفظ</button>
             <button class="admin-btn secondary" onclick="closeModal()">إلغاء</button>
@@ -354,9 +385,15 @@
 
     async function saveProduct(id) {
         const name = document.getElementById('m-name').value;
-        const price = document.getElementById('m-price').value;
+        const p250 = document.getElementById('m-price-250').value;
+        const p500 = document.getElementById('m-price-500').value;
+        const p1000 = document.getElementById('m-price-1000').value;
         const cat = document.getElementById('m-cat').value;
         const file = document.getElementById('m-file').files[0];
+
+        if (!name || !p250) {
+            return alert('يرجى إدخال اسم المنتج وسعر الربع كيلو على الأقل');
+        }
 
         let imageUrl = id ? products.find(x => x.id === id).image_url : null;
 
@@ -367,7 +404,8 @@
             imageUrl = fileName;
         }
 
-        const data = { name, price, category_id: cat, image_url: imageUrl, is_active: true };
+        const weightData = `250g:${p250}|500g:${p500 || 0}|1kg:${p1000 || 0}`;
+        const data = { name, price: p250, category_id: cat, image_url: imageUrl, weight: weightData, is_active: true };
         
         if(id) await supabaseClient.from('products').update(data).eq('id', id);
         else await supabaseClient.from('products').insert(data);
