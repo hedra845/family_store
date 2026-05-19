@@ -172,7 +172,11 @@
         const { data: o } = await supabaseClient.from('orders').select('*').order('created_at', {ascending: false}); orders = o || [];
         const { data: cp } = await supabaseClient.from('coupons').select('*'); coupons = cp || [];
         const { data: m } = await supabaseClient.from('contact_messages').select('*').order('created_at', {ascending: false}); messages = m || [];
-        const { data: bs } = await supabaseClient.from('best_sellers').select('*, products(*)'); bestSellers = bs || [];
+        const { data: bsData } = await supabaseClient.from('best_sellers').select('*');
+        bestSellers = (bsData || []).map(item => {
+            const p = products.find(x => x.id === item.product_id);
+            return { ...item, products: p };
+        });
         renderTab();
     }
 
@@ -383,13 +387,18 @@
         
         const data = { product_id: parseInt(productId), sales_count: salesCount };
         
+        let res;
         if (id) {
-            await supabaseClient.from('best_sellers').update({ sales_count: salesCount }).eq('id', id);
+            res = await supabaseClient.from('best_sellers').update({ sales_count: salesCount }).eq('id', id);
         } else {
-            await supabaseClient.from('best_sellers').insert(data);
+            res = await supabaseClient.from('best_sellers').insert(data);
         }
         
-        closeModal(); loadData();
+        if (res.error) {
+            alert('خطأ أثناء الحفظ في قاعدة البيانات: \n' + res.error.message);
+        } else {
+            closeModal(); loadData();
+        }
     }
 
     checkSession();
