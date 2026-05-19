@@ -765,8 +765,7 @@
         }
 
         input,
-        textarea,
-        select {
+        textarea {
             width: 100%;
             padding: 1.1rem;
             border-radius: 16px;
@@ -781,12 +780,50 @@
             font-size: 1rem;
         }
 
+        select {
+            width: 100%;
+            padding: 1.1rem;
+            border-radius: 16px;
+            border: 2px solid transparent;
+            outline: none;
+            margin-bottom: 1.2rem;
+            font-family: inherit;
+            text-align: right;
+            background: #f8f9fa;
+            transition: 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            font-size: 1rem;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B6DFF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 1.2rem center;
+            background-size: 1.2em;
+            padding-left: 3rem !important;
+        }
+
         input:focus,
         textarea:focus,
         select:focus {
             background: #fff;
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(255, 90, 159, 0.1), inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        /* Cart panel custom scrollbar */
+        .cart-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .cart-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .cart-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 90, 159, 0.35);
+            border-radius: 10px;
+        }
+        .cart-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 90, 159, 0.55);
         }
 
         #mascot {
@@ -1601,12 +1638,7 @@
         </div>
         <div
             style="border-top: 1px solid #eee; padding-top: 2rem; text-align: center; color: #aaa; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-            <p>&copy; ٢٠٢٤ قصر المكسرات — جميع الحقوق محفوظة.</p>
-            <a href="https://www.facebook.com/share/1NXDD56o3q/" target="_blank"
-                style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 8px 20px; border-radius: 50px; color: #555; font-weight: 700; transition: 0.3s; border: 1px solid #eee; font-size: 0.8rem;">
-                تم التطوير بواسطة <span style="color: var(--primary);">hedra.dev</span>
-                <i data-lucide="external-link" style="width: 14px;"></i>
-            </a>
+            <p>&copy; ٢٠٢٦ قصر المكسرات — جميع الحقوق محفوظة.</p>
         </div>
     </footer>
 
@@ -1618,8 +1650,8 @@
                 <h2 style="font-weight: 900; color: var(--secondary); display: flex; align-items: center; gap: 12px; margin: 0;">
                     سلة المشتريات <i data-lucide="shopping-bag" style="color: var(--primary);"></i>
                 </h2>
-                <button onclick="toggleCart()" style="background: rgba(255, 90, 159, 0.1); color: var(--primary); width: 40px; height: 40px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;">
-                    <i data-lucide="x" style="width: 20px;"></i>
+                <button onclick="toggleCart()" style="background: rgba(255, 90, 159, 0.08); color: var(--primary); width: 44px; height: 44px; border-radius: 16px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(255, 90, 159, 0.05);" onmouseover="this.style.background='var(--primary)'; this.style.color='#fff'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='rgba(255, 90, 159, 0.08)'; this.style.color='var(--primary)'; this.style.transform='scale(1)';">
+                    <i data-lucide="x" style="width: 22px; height: 22px;"></i>
                 </button>
             </div>
             
@@ -1667,6 +1699,7 @@
                         <input type="text" id="coupon-code" placeholder="كود الخصم (اختياري)" style="margin-bottom: 0; background: transparent; box-shadow: none; border: none; flex: 1;">
                         <button class="cart-btn" onclick="applyCoupon()" style="padding: 0 1.5rem; margin: 0; border-radius: 15px;">تطبيق</button>
                     </div>
+                    <div style="height: 1.5rem;"></div>
                 </div>
             </div>
             
