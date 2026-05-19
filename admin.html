@@ -109,6 +109,7 @@
             <li onclick="switchTab('reports')" id="btn-reports">📊 التقارير</li>
             <li onclick="switchTab('orders')" id="btn-orders" class="active">📦 الطلبات</li>
             <li onclick="switchTab('products')" id="btn-products">🥜 المنتجات</li>
+            <li onclick="switchTab('best_sellers')" id="btn-best_sellers">🔥 الأكثر مبيعاً</li>
             <li onclick="switchTab('cats')" id="btn-cats">📁 الأقسام</li>
             <li onclick="switchTab('coupons')" id="btn-coupons">🎟️ الكوبونات</li>
             <li onclick="switchTab('messages')" id="btn-messages">✉️ الرسائل</li>
@@ -130,7 +131,7 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let activeTab = 'orders';
-    let categories = [], products = [], orders = [], coupons = [], messages = [];
+    let categories = [], products = [], orders = [], coupons = [], messages = [], bestSellers = [];
 
     document.getElementById('login-btn').onclick = async () => {
         const btn = document.getElementById('login-btn');
@@ -171,6 +172,7 @@
         const { data: o } = await supabaseClient.from('orders').select('*').order('created_at', {ascending: false}); orders = o || [];
         const { data: cp } = await supabaseClient.from('coupons').select('*'); coupons = cp || [];
         const { data: m } = await supabaseClient.from('contact_messages').select('*').order('created_at', {ascending: false}); messages = m || [];
+        const { data: bs } = await supabaseClient.from('best_sellers').select('*, products(*)'); bestSellers = bs || [];
         renderTab();
     }
 
@@ -229,11 +231,27 @@
                 </td></tr>
             `).join('') + `</table>`;
         } else if (activeTab === 'messages') {
-            container.innerHTML = `<h2>✉️ رسائل العملاء</h2>` + messages.map(m => `
+            container.innerHTML = `<h2>✉️ الرسائل</h2>` + messages.map(m => `
                 <div style="background:#fff; padding:1.5rem; border-radius:15px; margin-top:1rem; border-right:4px solid var(--accent);">
                     <strong>${m.full_name || m.name} (${m.phone})</strong><p>${m.message}</p>
                 </div>
             `).join('');
+        } else if (activeTab === 'best_sellers') {
+            container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>🔥 الأكثر مبيعاً</h2><button class="admin-btn" onclick="showBestSellerModal()">+ إضافة منتج للأكثر مبيعاً</button></div>
+            <table><tr><th>صورة</th><th>الاسم</th><th>عدد المبيعات الافتراضي</th><th>التحكم</th></tr>` + bestSellers.map(bs => {
+                const p = bs.products || {};
+                return `
+                <tr>
+                    <td><img src="${getImageUrl(p.image_url)}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;"></td>
+                    <td>${p.name || 'منتج غير معروف'}</td>
+                    <td>${bs.sales_count}</td>
+                    <td>
+                        <button onclick="showBestSellerModal(${bs.id})" style="color:blue; border:none; background:none; cursor:pointer;">تعديل</button>
+                        <button onclick="deleteItem('best_sellers', ${bs.id})" style="color:red; border:none; background:none; cursor:pointer; margin-right:10px;">حذف</button>
+                    </td>
+                </tr>
+                `;
+            }).join('') + `</table>`;
         } else if (activeTab === 'reports') {
             const rev = orders.reduce((s,o)=>s+(o.total_amount||0), 0);
             container.innerHTML = `<h2>📊 التقارير</h2>
@@ -335,6 +353,42 @@
     }
     async function saveCoupon() {
         await supabaseClient.from('coupons').insert({ code: document.getElementById('m-code').value, discount_percent: document.getElementById('m-percent').value });
+        closeModal(); loadData();
+    }
+
+    // Best Seller Modals and saving
+    function showBestSellerModal(id = null) {
+        const bs = id ? bestSellers.find(x => x.id === id) : { product_id: '', sales_count: 0 };
+        const currentBsProductIds = bestSellers.map(x => x.product_id);
+        const availableProducts = products.filter(p => !currentBsProductIds.includes(p.id) || p.id === bs.product_id);
+        
+        openModal(`
+            <h3>${id ? 'تعديل الأكثر مبيعاً' : 'إضافة للأكثر مبيعاً'}</h3>
+            <label style="display:block; margin: 1rem 0 0.5rem; font-weight:700;">اختر المنتج</label>
+            <select id="bs-product" ${id ? 'disabled' : ''}>
+                ${availableProducts.map(p => `<option value="${p.id}" ${p.id === bs.product_id ? 'selected' : ''}>${p.name} (${p.price} EGP)</option>`).join('')}
+            </select>
+            <label style="display:block; margin: 0.5rem 0; font-weight:700;">عدد المبيعات الافتراضي</label>
+            <input id="bs-sales" type="number" value="${bs.sales_count}" placeholder="عدد المبيعات">
+            <button class="admin-btn" onclick="saveBestSeller(${id})">حفظ</button>
+            <button class="admin-btn secondary" onclick="closeModal()">إلغاء</button>
+        `);
+    }
+
+    async function saveBestSeller(id) {
+        const productId = document.getElementById('bs-product').value;
+        const salesCount = parseInt(document.getElementById('bs-sales').value) || 0;
+        
+        if (!productId) return alert('يرجى اختيار منتج');
+        
+        const data = { product_id: parseInt(productId), sales_count: salesCount };
+        
+        if (id) {
+            await supabaseClient.from('best_sellers').update({ sales_count: salesCount }).eq('id', id);
+        } else {
+            await supabaseClient.from('best_sellers').insert(data);
+        }
+        
         closeModal(); loadData();
     }
 

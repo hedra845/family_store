@@ -1093,13 +1093,6 @@
 
 <body style="overflow-x: hidden;">
 
-    <div class="candy-rain" id="candy-container"></div>
-
-    <!-- Spin Wheel -->
-    <div id="wheel-trigger" onclick="openWheel()">
-        <i data-lucide="gift" style="width:30px; height:30px;"></i>
-    </div>
-
     <div id="wheel-overlay">
         <div class="wheel-container">
             <button onclick="closeWheel()"
@@ -1119,19 +1112,11 @@
         </div>
     </div>
 
-    <!-- Admin Access -->
-    <a href="admin.html" class="admin-link" title="الإدارة">
-        <i data-lucide="lock" style="width:28px; height:28px;"></i>
-    </a>
-
-    <!-- Talking Mascot -->
-    <div id="mascot-container" onclick="window.open('https://wa.me/201551407492', '_blank')">
-        <div class="speech-bubble" id="mascot-text">أهلاً بك في قصرنا! ✨</div>
-        <img src="https://cdn-icons-png.flaticon.com/512/3408/3408455.png" class="mascot-char" alt="Mascot Character">
-    </div>
-
     <nav class="glass">
-        <a href="#" class="logo">قصر المكسرات <i data-lucide="store" style="width:24px;"></i></a>
+        <a href="#" class="logo">
+            <img src="logo.png" alt="شعار قصر المكسرات" style="height: 45px; width: auto; object-fit: contain;">
+            قصر المكسرات
+        </a>
         <ul class="nav-links">
             <li><a href="#hero">الرئيسية</a></li>
             <li><a href="#products">المنتجات</a></li>
@@ -1169,7 +1154,7 @@
         </div>
         <div class="hero-visual">
             <div class="visual-container"></div>
-            <img src="hero-girl.jpg" class="hero-girl-img" alt="قصر المكسرات">
+            <img src="hero-nuts.jpg" class="hero-girl-img" alt="قصر المكسرات">
             <!-- Decorative elements -->
             <div
                 style="position: absolute; top: 10%; right: 0; background: #fff; padding: 15px; border-radius: 20px; box-shadow: var(--shadow); z-index: 3; display: flex; align-items: center; gap: 10px; animation: float 4s infinite;">
@@ -1180,8 +1165,7 @@
             <div
                 style="position: absolute; bottom: 10%; left: 0; background: #fff; padding: 15px; border-radius: 20px; box-shadow: var(--shadow); z-index: 3; display: flex; align-items: center; gap: 10px; animation: float 6s infinite reverse;">
                 <i data-lucide="zap" style="color: var(--primary); width: 30px; height: 30px;"></i>
-                <div><strong style="display: block; font-size: 0.8rem;">توصيل سريع</strong><small
-                        style="opacity: 0.7;">خلال 24 ساعة</small></div>
+                <div><strong style="display: block; font-size: 0.8rem;">توصيل سريع</strong></div>
             </div>
         </div>
     </section>
@@ -1253,8 +1237,20 @@
         </div>
     </section>
 
+    <!-- ══ BEST SELLERS SECTION ══ -->
+    <section id="best-sellers-section" class="reveal" style="padding: 6rem 8% 0; display: none;">
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <span style="background: rgba(255, 90, 159, 0.1); color: var(--primary); padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 1rem;">
+                🔥 اختيار عملائنا المفضل
+            </span>
+            <h2 style="font-size: 3.5rem; font-weight: 900; color: var(--secondary); margin-bottom: 1rem;">الأكثر <em>مبيعاً</em></h2>
+            <p style="color: var(--text-soft); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">استكشف المنتجات التي نالت إعجاب ورضا آلاف العملاء وحققت أعلى المبيعات في قصرنا.</p>
+        </div>
+        <div class="products-grid" id="best-sellers-grid"></div>
+    </section>
+
     <!-- ══ PRODUCTS SECTION ══ -->
-    <section id="products" class="reveal" style="padding: 10rem 8%;">
+    <section id="products" class="reveal" style="padding: 6rem 8% 10rem;">
         <div style="text-align: center; margin-bottom: 6rem;">
             <h2 style="font-size: 4rem; font-weight: 900; color: var(--secondary); margin-bottom: 1rem;">قائمتنا
                 <em>المختارة</em></h2>
@@ -1422,6 +1418,7 @@
                     <li><a href="#products" style="text-decoration: none; color: #555;">منتجاتنا</a></li>
                     <li><a href="#track-order" style="text-decoration: none; color: #555;">تتبع طلبك</a></li>
                     <li><a href="#contact-form-section" style="text-decoration: none; color: #555;">تواصل معنا</a></li>
+                    <li><a href="admin.html" style="text-decoration: none; color: #555;">لوحة التحكم (الإدارة)</a></li>
                 </ul>
             </div>
             <div>
@@ -1527,7 +1524,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kbnVsYW5weHR5aWJxYnl4amh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDk2NjIsImV4cCI6MjA5NDE4NTY2Mn0.5ZBZeoUiKdAqO_W0S4X2J1BmDvNBI-z4LuO1aYJDrCs';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let allProducts = [], categories = [], cart = [], activeCat = 'all', activeCoupon = null;
+        let allProducts = [], categories = [], cart = [], activeCat = 'all', activeCoupon = null, bestSellers = [];
 
         function toggleInstapayInfo() {
             const isInstapay = document.querySelector('input[name="pay"]:checked').value === 'instapay';
@@ -1540,17 +1537,10 @@
             const { data: prodData } = await supabaseClient.from('products').select('*').eq('is_active', true);
             allProducts = prodData || []; renderProducts();
             loadTestimonials();
+            loadBestSellers();
 
-            // Mascot Talking logic
-            const messages = ["أهلاً بك في قصرنا! ✨", "هل جربت فستقنا الفاخر؟ 😋", "أفضل المكسرات بانتظارك! 🏰", "اطلب الآن واستمتع بالمذاق! 🛒"];
-            let msgIdx = 0;
-            setInterval(() => {
-                const bubble = document.getElementById('mascot-text');
-                if (bubble) {
-                    msgIdx = (msgIdx + 1) % messages.length;
-                    bubble.innerText = messages[msgIdx];
-                }
-            }, 4000);
+            // تم إزالة المساعد الذكي العائم بناءً على طلبك
+
         }
 
         function renderCategories() {
@@ -1587,6 +1577,39 @@
             if (!p) return 'https://via.placeholder.com/300';
             if (p.startsWith('http')) return p;
             return `${SUPABASE_URL}/storage/v1/object/public/products/${p}`;
+        }
+
+        async function loadBestSellers() {
+            try {
+                const { data, error } = await supabaseClient.from('best_sellers').select('*, products(*)').order('sales_count', { ascending: false });
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    document.getElementById('best-sellers-section').style.display = 'block';
+                    const grid = document.getElementById('best-sellers-grid');
+                    grid.innerHTML = data.map(item => {
+                        const p = item.products;
+                        if (!p || !p.is_active) return '';
+                        return `
+                        <div class="card glass" style="border: 2px solid rgba(255, 90, 159, 0.15); position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 15px; left: 15px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 6px 12px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; z-index: 10; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(255, 90, 159, 0.3);">
+                                <span>🔥 الأكثر مبيعاً</span>
+                            </div>
+                            <div class="card-img"><img src="${getImageUrl(p.image_url)}" alt="${p.name}"></div>
+                            <h3>${p.name}</h3>
+                            <div class="card-footer">
+                                <div class="price">${p.price} EGP</div>
+                                <button class="add-btn" onclick="addToCart(${p.id})" title="إضافة للسلة">
+                                    <i data-lucide="plus" style="width:22px; height:22px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.error("Error loading best sellers:", e);
+            }
         }
 
         function addToCart(id) {
@@ -1685,6 +1708,7 @@
         // ══ CANDY RAIN LOGIC ══
         function createCandy() {
             const container = document.getElementById('candy-container');
+            if (!container) return;
             const candies = ['🍬', '🍭', '🍫', '🍩', '🍪', '🍨'];
             const candy = document.createElement('div');
             candy.className = 'candy';
@@ -1695,7 +1719,6 @@
 
             setTimeout(() => candy.remove(), 7000);
         }
-        setInterval(createCandy, 500);
 
         async function trackOrder() {
             const id = document.getElementById('track-id').value;
