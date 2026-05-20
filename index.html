@@ -2228,7 +2228,7 @@
                 let weightSelectorHtml = `<div style="text-align: center; color: var(--secondary); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; background: var(--bg); padding: 5px; border-radius: 8px;">100 جرام: ${parseFloat((p.price * 100).toFixed(2))} ج.م</div>`;
 
                 return `
-                <div class="card" onclick="addToCart(${p.id})">
+                <div class="card">
                     <div class="card-header">
                         ${p.badge ? `<div class="card-badge">${p.badge === 'hot' ? 'الأكثر مبيعاً' : p.badge === 'sale' ? 'تخفيض' : p.badge === 'new' ? 'جديد' : p.badge}</div>` : `<div class="card-badge">مميز</div>`}
                         <button class="fav-btn" onclick="event.stopPropagation();">
@@ -2289,7 +2289,7 @@
                             let weightSelectorHtml = `<div style="text-align: center; color: var(--secondary); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; background: var(--bg); padding: 5px; border-radius: 8px;">100 جرام: ${parseFloat((p.price * 100).toFixed(2))} ج.م</div>`;
                             
                             return `
-                            <div class="card best-seller-card" onclick="addToCart(${p.id})" style="flex: 0 0 310px; scroll-snap-align: start;">
+                            <div class="card best-seller-card" style="flex: 0 0 310px; scroll-snap-align: start;">
                                 <div class="card-header">
                                     <div class="card-badge">${p.badge === 'hot' ? 'الأكثر مبيعاً' : p.badge === 'sale' ? 'تخفيض' : p.badge === 'new' ? 'جديد' : 'الأكثر مبيعاً'}</div>
                                     <button class="fav-btn" onclick="event.stopPropagation();">
