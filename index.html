@@ -2198,13 +2198,13 @@
             // Update normal price label
             const priceEl = document.getElementById(`price-${productId}`);
             if (priceEl) {
-                priceEl.innerText = `EGP ${priceInfo.selectedPrice * 100}`;
+                priceEl.innerText = `EGP ${parseFloat((priceInfo.selectedPrice * 100).toFixed(2))}`;
             }
             
             // Update best seller price label
             const priceBsEl = document.getElementById(`price-bs-${productId}`);
             if (priceBsEl) {
-                priceBsEl.innerText = `EGP ${priceInfo.selectedPrice * 100}`;
+                priceBsEl.innerText = `EGP ${parseFloat((priceInfo.selectedPrice * 100).toFixed(2))}`;
             }
             
             // Update the active weight buttons inside BOTH normal and best seller cards if they exist
@@ -2225,7 +2225,7 @@
                 const currentWeight = selectedWeights[p.id] || '250g';
                 const priceInfo = getProductPriceInfo(p, currentWeight);
                 
-                let weightSelectorHtml = `<div style="text-align: center; color: var(--secondary); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; background: var(--bg); padding: 5px; border-radius: 8px;">100 جرام: ${p.price * 100} ج.م</div>`;
+                let weightSelectorHtml = `<div style="text-align: center; color: var(--secondary); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; background: var(--bg); padding: 5px; border-radius: 8px;">100 جرام: ${parseFloat((p.price * 100).toFixed(2))} ج.م</div>`;
 
                 return `
                 <div class="card" onclick="addToCart(${p.id})">
@@ -2248,7 +2248,7 @@
                     ${weightSelectorHtml}
 
                     <div class="card-footer">
-                        <div id="price-${p.id}" class="price">EGP ${p.price * 100}</div>
+                        <div id="price-${p.id}" class="price">EGP ${parseFloat((p.price * 100).toFixed(2))}</div>
                         <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
                             <i data-lucide="shopping-cart" style="width:18px; height:18px; margin-left: 5px;"></i>
                             أضف للسلة
@@ -2286,7 +2286,7 @@
                             const currentWeight = selectedWeights[p.id] || '250g';
                             const priceInfo = getProductPriceInfo(p, currentWeight);
                             
-                            let weightSelectorHtml = `<div style="text-align: center; color: var(--secondary); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; background: var(--bg); padding: 5px; border-radius: 8px;">100 جرام: ${p.price * 100} ج.م</div>`;
+                            let weightSelectorHtml = `<div style="text-align: center; color: var(--secondary); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; background: var(--bg); padding: 5px; border-radius: 8px;">100 جرام: ${parseFloat((p.price * 100).toFixed(2))} ج.م</div>`;
                             
                             return `
                             <div class="card best-seller-card" onclick="addToCart(${p.id})" style="flex: 0 0 310px; scroll-snap-align: start;">
@@ -2309,7 +2309,7 @@
                                 ${weightSelectorHtml}
 
                                 <div class="card-footer">
-                                    <div id="price-bs-${p.id}" class="price">EGP ${p.price * 100}</div>
+                                    <div id="price-bs-${p.id}" class="price">EGP ${parseFloat((p.price * 100).toFixed(2))}</div>
                                     <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
                                         <i data-lucide="shopping-cart" style="width:18px; height:18px; margin-left: 5px;"></i>
                                         أضف للسلة
