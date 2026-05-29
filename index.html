@@ -2381,22 +2381,26 @@
 
         function addToCart(id) {
             const prod = allProducts.find(p => p.id === id);
+            if (!prod) return;
             let basePrice = parseFloat(prod.price) || 0; // price per gram
-            let cartItemId = id;
+            const cartItemId = id;
             
+            // If product already in cart, do nothing (prevent duplicate)
             const exists = cart.find(item => item.cartItemId === cartItemId);
             if (exists) {
-                exists.qty += 100;
-            } else {
-                cart.push({
-                    cartItemId: cartItemId,
-                    id: id,
-                    name: prod.name,
-                    basePrice: basePrice,
-                    qty: 100,
-                    image_url: prod.image_url
-                });
+                // Optionally update quantity or just ignore
+                // exists.qty += 100; // comment out to prevent duplicate increments
+                return; // exit without adding duplicate entry
             }
+            
+            cart.push({
+                cartItemId: cartItemId,
+                id: id,
+                name: prod.name,
+                basePrice: basePrice,
+                qty: 100,
+                image_url: prod.image_url
+            });
             updateCart();
             const overlay = document.getElementById('cart-overlay');
             if (overlay.style.display !== 'flex') {
