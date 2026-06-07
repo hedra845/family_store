@@ -2254,10 +2254,19 @@
             const grid = document.getElementById('products-grid');
             const filtered = allProducts.filter(p => {
                 const matchesCat = activeCat === 'all' || p.category_id == activeCat;
-                const matchesSearch = !productSearchQuery ? true : (
-                    p.name.toLowerCase().includes(productSearchQuery.toLowerCase()) ||
-                    (p.badge && p.badge.toLowerCase().includes(productSearchQuery.toLowerCase()))
-                );
+                let matchesSearch = true;
+                if (productSearchQuery) {
+                    const searchTerms = productSearchQuery.toLowerCase().trim().split(/\s+/);
+                    const nameLower = p.name.toLowerCase();
+                    const descLower = (p.description || '').toLowerCase();
+                    const badgeLower = (p.badge || '').toLowerCase();
+                    
+                    matchesSearch = searchTerms.every(term => 
+                        nameLower.includes(term) || 
+                        descLower.includes(term) || 
+                        badgeLower.includes(term)
+                    );
+                }
                 return matchesCat && matchesSearch;
             });
 
