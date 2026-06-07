@@ -242,6 +242,11 @@
     }
 
     function renderTab() {
+        const activeEl = document.activeElement;
+        const activeId = activeEl ? activeEl.id : null;
+        const start = activeEl ? activeEl.selectionStart : 0;
+        const end = activeEl ? activeEl.selectionEnd : 0;
+
         const container = document.getElementById('tab-content');
         if (activeTab === 'orders') {
             // Apply filtering in memory
@@ -273,7 +278,7 @@
                 </div>
                 
                 <div style="display:flex; gap:12px; margin-bottom:1.5rem; flex-wrap:wrap; background:#fff; padding:1.2rem; border-radius:20px; box-shadow: var(--shadow);">
-                    <input type="text" placeholder="🔍 ابحث باسم العميل، الهاتف، أو رقم الطلب..." 
+                    <input type="text" id="admin-order-search" placeholder="🔍 ابحث باسم العميل، الهاتف، أو رقم الطلب..." 
                         value="${orderSearchQuery}" 
                         oninput="orderSearchQuery = this.value; renderTab();" 
                         style="flex:2; margin-bottom:0; padding:0.8rem 1.2rem; border-radius:12px; border:1.5px solid #eee; min-width: 250px;">
@@ -367,7 +372,7 @@
                 </div>
                 
                 <div style="display:flex; gap:12px; margin-bottom:1.5rem; flex-wrap:wrap; background:#fff; padding:1.2rem; border-radius:20px; box-shadow: var(--shadow);">
-                    <input type="text" placeholder="🔍 ابحث باسم المنتج أو الرقم..." 
+                    <input type="text" id="admin-product-search" placeholder="🔍 ابحث باسم المنتج أو الرقم..." 
                         value="${productSearchQuery}" 
                         oninput="productSearchQuery = this.value; renderTab();" 
                         style="flex:1; margin-bottom:0; padding:0.8rem 1.2rem; border-radius:12px; border:1.5px solid #eee; min-width: 250px;">
@@ -614,6 +619,16 @@
                     <button class="admin-btn" onclick="saveSettings()" style="width:100%; font-size:1.1rem; padding:1rem; border-radius:12px; margin-top:1rem;">حفظ الإعدادات</button>
                 </div>
             `;
+        }
+
+        if (activeId) {
+            const el = document.getElementById(activeId);
+            if (el) {
+                el.focus();
+                if (el.setSelectionRange) {
+                    el.setSelectionRange(start, end);
+                }
+            }
         }
     }
 
