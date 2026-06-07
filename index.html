@@ -1713,6 +1713,21 @@
         <div style="text-align: center; margin-bottom: 3rem;">
             <h2 style="font-size: 3.5rem; font-weight: 900; color: var(--secondary); margin-bottom: 1rem;">المنتجات</h2>
         </div>
+        
+        <!-- Search Bar -->
+        <div style="max-width: 600px; margin: 0 auto 3rem; padding: 0 1rem; position: relative;">
+            <div style="position: relative; display: flex; align-items: center;">
+                <input type="text" id="product-search" placeholder="ابحث عن مكسراتك المفضلة (فستق، كاجو، كاندي...)" 
+                    oninput="handleSearch(this.value)"
+                    style="margin-bottom: 0; padding-right: 3.2rem; padding-left: 3.2rem; font-size: 1.1rem; height: 56px; border-radius: 20px; border: 2px solid rgba(155, 109, 255, 0.15); box-shadow: 0 10px 25px rgba(155, 109, 255, 0.05); text-align: right; width: 100%;">
+                <i data-lucide="search" style="position: absolute; right: 1.2rem; color: var(--primary); width: 22px; height: 22px; pointer-events: none;"></i>
+                <button id="clear-search-btn" onclick="clearSearch()" 
+                    style="position: absolute; left: 1.2rem; background: none; border: none; cursor: pointer; color: var(--text-soft); display: none; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: all 0.3s; padding: 0;">
+                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+        </div>
+
         <div class="products-grid" id="products-grid"></div>
     </section>
 
@@ -2039,7 +2054,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kbnVsYW5weHR5aWJxYnl4amh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDk2NjIsImV4cCI6MjA5NDE4NTY2Mn0.5ZBZeoUiKdAqO_W0S4X2J1BmDvNBI-z4LuO1aYJDrCs';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let allProducts = [], categories = [], cart = [], activeCat = 'all', activeCoupon = null, bestSellers = [], shippingZones = [];
+        let allProducts = [], categories = [], cart = [], activeCat = 'all', activeCoupon = null, bestSellers = [], shippingZones = [], productSearchQuery = '';
 
 
 
@@ -2218,9 +2233,55 @@
             });
         }
 
+        function handleSearch(val) {
+            productSearchQuery = val;
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (clearBtn) {
+                clearBtn.style.display = val ? 'flex' : 'none';
+            }
+            renderProducts();
+        }
+
+        function clearSearch() {
+            const searchInput = document.getElementById('product-search');
+            if (searchInput) {
+                searchInput.value = '';
+                handleSearch('');
+            }
+        }
+
         function renderProducts() {
             const grid = document.getElementById('products-grid');
-            const filtered = activeCat === 'all' ? allProducts : allProducts.filter(p => p.category_id == activeCat);
+            const filtered = allProducts.filter(p => {
+                const matchesCat = activeCat === 'all' || p.category_id == activeCat;
+                const matchesSearch = !productSearchQuery ? true : (
+                    p.name.toLowerCase().includes(productSearchQuery.toLowerCase()) ||
+                    (p.badge && p.badge.toLowerCase().includes(productSearchQuery.toLowerCase()))
+                );
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.style.display = 'block';
+                grid.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 2rem; color: var(--text-soft); background: #fff; border-radius: 30px; box-shadow: var(--shadow); border: 1px solid rgba(155, 109, 255, 0.1); max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
+                        <div style="background: rgba(255, 90, 159, 0.08); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--secondary);">
+                            <i data-lucide="search-x" style="width: 40px; height: 40px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.5rem;">عذراً، لم نجد أي نتائج!</h3>
+                            <p style="font-size: 1rem; opacity: 0.8;">تأكد من كتابة الكلمة بشكل صحيح أو جرب البحث بكلمات أخرى.</p>
+                        </div>
+                        <button class="cart-btn" onclick="clearSearch()" style="padding: 0.8rem 2rem;">
+                            عرض كل المنتجات
+                        </button>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            grid.style.display = 'grid';
             grid.innerHTML = filtered.map(p => {
                 const currentWeight = selectedWeights[p.id] || '250g';
                 const priceInfo = getProductPriceInfo(p, currentWeight);
