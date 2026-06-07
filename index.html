@@ -2155,7 +2155,7 @@
                 </div>`;
             });
             container.innerHTML = html;
-            lucide.createIcons();
+            lucide.createIcons({ root: container });
         }
 
         function filterByCat(id) { activeCat = id; renderCategories(); renderProducts(); }
@@ -2290,7 +2290,7 @@
                         </button>
                     </div>
                 `;
-                lucide.createIcons();
+                lucide.createIcons({ root: grid });
                 return;
             }
 
@@ -2331,7 +2331,7 @@
                 </div>
                 `;
             }).join('');
-            lucide.createIcons();
+            lucide.createIcons({ root: grid });
         }
 
         function getImageUrl(p) {
