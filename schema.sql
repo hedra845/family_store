@@ -1,4 +1,4 @@
--- Database Schema for Qasr Al-Mukassarat (قصر المكسرات)
+-- Database Schema for Family Store
 
 -- 1. Categories Table
 CREATE TABLE categories (
