@@ -2468,7 +2468,7 @@
         function addToCart(id) {
             const prod = allProducts.find(p => p.id === id);
             if (!prod) return;
-            let basePrice = parseFloat(prod.price) || 0; // price per gram
+            let basePrice = parseFloat(prod.price) || 0; // base product price
             const cartItemId = id;
             
             // If product already in cart, do nothing (prevent duplicate)

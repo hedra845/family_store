@@ -18,10 +18,9 @@ CREATE TABLE products (
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     old_price DECIMAL(10, 2),
-    weight VARCHAR(50),
-    emoji VARCHAR(10), -- Using emoji for now as in the original code
-    image_url TEXT,    -- For future use with real images
-    badge VARCHAR(50), -- 'hot', 'new', 'sale', etc.
+    emoji VARCHAR(10), 
+    image_url TEXT,    
+    badge VARCHAR(50), 
     rating DECIMAL(2, 1) DEFAULT 5.0,
     reviews_count INTEGER DEFAULT 0,
     stock_quantity INTEGER DEFAULT 100,
@@ -76,13 +75,13 @@ CREATE TABLE newsletter_subscriptions (
 
 -- Initial Data (Seeding)
 INSERT INTO categories (name, slug, emoji) VALUES 
-('مكسرات', 'nuts', '🥜'),
-('فواكه مجففة', 'dried', '🍇'),
-('حلويات', 'candy', '🍬'),
-('شوكولاتة', 'chocolate', '🍫'),
-('هدايا مشكلة', 'mix', '🎁');
+('ملابس أطفال', 'kids-clothes', '👕'),
+('ألعاب', 'toys', '🧸'),
+('مستلزمات مواليد', 'baby-needs', '🍼'),
+('إكسسوارات', 'accessories', '🎀');
 
-INSERT INTO products (category_id, (SELECT id FROM categories WHERE slug = 'nuts'), 'مكسرات مشكلة فاخرة', 149, NULL, '500g', '🥜', 'hot', 5, 234);
+INSERT INTO products (category_id, name, price, emoji, badge, rating, reviews_count) VALUES 
+((SELECT id FROM categories WHERE slug = 'kids-clothes'), 'طقم خروج أنيق', 250, '👕', 'hot', 5, 234);
 -- Note: Fixed the insert to use proper relations if needed, but for simplicity:
 -- This is just a schema template.
 
