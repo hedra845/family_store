@@ -2654,7 +2654,7 @@
             const fullAddress = `${addr} || المنتجات: ${itemsSummary}`;
 
             try {
-                const { data: order, error } = await supabaseClient.from('orders').insert({
+                const { error } = await supabaseClient.from('orders').insert({
                     customer_name: name,
                     customer_phone: phone,
                     city: city,
@@ -2662,9 +2662,9 @@
                     payment_method: payMethod,
                     total_amount: grandTotal,
                     status: 'pending'
-                }).select().single();
+                });
                 if (error) throw error;
-                alert('تم تقديم طلبك بنجاح! رقم الطلب: ' + order.id);
+                alert('تم تقديم طلبك بنجاح! هنتواصل معاك في أقرب وقت للتأكيد.');
                 cart = []; updateCart(); toggleCart();
             } catch (e) { alert('خطأ: ' + e.message); }
         };
